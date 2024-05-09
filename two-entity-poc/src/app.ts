@@ -11,7 +11,9 @@ import { errorMiddleware } from "./util/error-middleware";
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
+app.use(bodyParser.json()); // application/json
+
 app.use(express.static(path.join(__dirname, "../", "public")));
 
 app.use((req: Request, res: Response, next: NextFunction) => {
