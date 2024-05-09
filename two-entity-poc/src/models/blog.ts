@@ -30,7 +30,7 @@ Blog.init(
         // Custom validation rule to check for empty string with escape characters
         isValidTitle (value: string) {
           if (EMPTY_STRING_REGEX.test(value)) {
-            throw new Error(ERROR_MESSAGES.TITLE_MIN_LENGTH);
+            throw new Error(ERROR_MESSAGES.getRequiredErrorMessage('Title'));
           }
         },
       },

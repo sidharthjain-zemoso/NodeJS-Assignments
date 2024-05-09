@@ -1,11 +1,25 @@
-export enum ERROR_MESSAGES {
-    TITLE_REQUIRED = "Title is required",
-    TITLE_MIN_LENGTH = "Title must be at least 5 characters long",
-    TITLE_STRING = "Title must be a string",
-    TITLE_MAX_LENGTH = "Title cannot exceed 50 characters",
-    IMAGE_URL_REQUIRED = "Image URL is required",
-    CONTENT_REQUIRED = "Content is required",
-    BLOG_ID_QUERY_PARAM_REQUIRED = "Blog ID is required as Query Param",
-    BLOG_ID_PATH_PARAM_REQUIRED = "Blog ID is required as Path Param",
-    BLOG_ID_INTEGER = "Expected Blog ID to be an Integer",
+export const ERROR_MESSAGES = {
+    getQeryParamErrorMessage (key: string): string {
+        return `${key} is required as Query Param`;
+    },
+
+    getPathParamErrorMessage (key: string): string {
+        return `${key} is required as Path Param`;
+    },
+
+    getDataTypeErrorMessage (key: string, type: string): string {
+        return `${key} must be of type ${type}`;
+    },
+
+    getRequiredErrorMessage (key: string): string {
+        return `${key} is required`;
+    },
+
+    getMinStringErrorMessage (key: string, len: number): string {
+        return `${key} must be at least ${len} characters long`;
+    },
+
+    getMaxStringErrorMessage (key: string, len: number): string {
+        return `${key} cannot exceed ${len} characters`;
+    }
 }
