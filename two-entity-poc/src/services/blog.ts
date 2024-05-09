@@ -15,7 +15,7 @@ const BlogService = {
 
     async getBlogDataById (user: IUser, blogId: number): Promise<Blog | null> {
         try {
-            const blog = await user.getBlog(blogId);
+            const blog = await Blog.findByPk(blogId);
             return blog;
         } catch (error) {
             throw new Error(ERROR_MESSAGES.FAILED_TO_FETCH_BLOG);
