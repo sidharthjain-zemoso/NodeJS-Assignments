@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { body, validationResult } from "express-validator";
+import { body } from "express-validator";
 import { ERROR_MESSAGES } from "../constants/validation-messages";
+import { handleValidationErrors } from "../middlewares/validation-error-handler";
 
 const blogValidators = {
     validateBlogInput: [
@@ -47,14 +47,6 @@ const blogValidators = {
 
         handleValidationErrors,
     ]
-}
-
-function handleValidationErrors (req: Request, res: Response, next: NextFunction) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ message: errors.array()[0].msg });
-    }
-    next();
 }
 
 export default blogValidators;

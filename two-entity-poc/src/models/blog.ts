@@ -6,10 +6,10 @@ import { EMPTY_STRING_REGEX } from "../constants/regex";
 import { ERROR_MESSAGES } from "../constants/validation-messages";
 class Blog extends Model<InferAttributes<IBlog>> {
   declare id: CreationOptional<number>;
-  declare title: String;
+  declare title: string;
   declare price: number;
-  declare imageUrl: String;
-  declare description: String;
+  declare imageUrl: string;
+  declare description: string;
 }
 
 Blog.init(

@@ -7,7 +7,7 @@ import User from "./models/user";
 
 import blogRoutes from "./routes/blog";
 import Blog from "./models/blog";
-import { errorMiddleware } from "./util/error-middleware";
+import { errorMiddleware } from "./middlewares/error-middleware";
 
 const app = express();
 
