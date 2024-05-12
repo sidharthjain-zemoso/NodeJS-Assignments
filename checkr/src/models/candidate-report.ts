@@ -1,25 +1,18 @@
-import { Table, Column, Model, ForeignKey, BelongsTo, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, ForeignKey, BelongsTo, DataType, Index } from 'sequelize-typescript';
 import { Candidate } from './candidate';
-
-enum Status {
-    Clear = 'clear',
-    Consider = 'consider'
-}
-
-enum Adjudication {
-    AdverseAction = 'adverse action',
-    Engage = 'engage'
-}
+import { Adjudication, Status } from '../constants/global';
 
 @Table
 export class CandidateReport extends Model<CandidateReport> {
-    @Column({ primaryKey: true, autoIncrement: true })
-    reportId!: number;
+    @Index
+    @ForeignKey(() => Candidate)
+    @Column({ primaryKey: true })
+    candidateId!: number;
 
     @Column
     ({
         type: DataType.ENUM,
-        values: ['clear', 'consider'],
+        values: [Status.CLEAR, Status.CONSIDER],
         allowNull: false
     })
     status!: Status;
@@ -27,7 +20,7 @@ export class CandidateReport extends Model<CandidateReport> {
     @Column
     ({
         type: DataType.ENUM,
-        values: ['adverse action', 'engage'],
+        values: [Adjudication.ADVERSE_ACTION, Adjudication.ENGAGE],
         allowNull: false
     })
     adjudication!: Adjudication;
@@ -43,10 +36,6 @@ export class CandidateReport extends Model<CandidateReport> {
 
     @Column
     updatedDate!: Date;
-
-    @ForeignKey(() => Candidate)
-    @Column
-    candidateId!: number;
 
     @BelongsTo(() => Candidate)
     candidate!: Candidate;

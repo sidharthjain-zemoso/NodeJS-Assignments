@@ -13,7 +13,8 @@ const app = express();
 
 app.use(cors());
 
-app.use(bodyParser.json());
+// not needed with express 4.16+
+// app.use(bodyParser.json());
 
 app.use("/", userRoutes);
 app.use("/candidate", candidateRoutes);

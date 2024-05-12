@@ -1,4 +1,4 @@
-import { Table, Column, Model, ForeignKey, BelongsTo, Length, IsEmail, isDataType } from 'sequelize-typescript';
+import { Table, Column, Model, ForeignKey, BelongsTo, Length, IsEmail, isDataType, Index } from 'sequelize-typescript';
 import { User } from './user';
 
 @Table
@@ -35,6 +35,7 @@ export class Candidate extends Model<Candidate> {
     @Column
     createdDate!: Date;
 
+    @Index
     @ForeignKey(() => User)
     @Column
     userId!: number;

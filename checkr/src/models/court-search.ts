@@ -1,11 +1,6 @@
-import { Table, Column, Model, ForeignKey, BelongsTo, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, ForeignKey, BelongsTo, DataType, Index } from 'sequelize-typescript';
 import { Candidate } from './candidate';
-
-// Define the enum outside the class declaration
-enum Status {
-    Clear = 'clear',
-    Consider = 'consider'
-}
+import { Status } from '../constants/global';
 
 @Table
 export class CourtSearch extends Model<CourtSearch> {
@@ -17,7 +12,7 @@ export class CourtSearch extends Model<CourtSearch> {
 
     @Column({
         type: DataType.ENUM,
-        values: ['clear', 'consider'],
+        values: [Status.CLEAR, Status.CONSIDER],
         allowNull: false
     })
     status!: Status;
@@ -25,6 +20,7 @@ export class CourtSearch extends Model<CourtSearch> {
     @Column
     date!: Date;
 
+    @Index
     @ForeignKey(() => Candidate)
     @Column
     candidateId!: number;
