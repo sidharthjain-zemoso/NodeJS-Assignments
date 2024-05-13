@@ -8,6 +8,7 @@ export const validateRequest = (schema: z.ZodObject<any, any>) => {
             schema.parse(req.body);
             next();
         } catch (error: any) {
+            console.error(error);
             res.status(httpStatus.BAD_REQUEST).json({ error: error.message });
         }
     };

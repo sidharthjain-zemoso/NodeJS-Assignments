@@ -5,5 +5,6 @@ import httpStatus from "http-status";
 import CustomError from "../interfaces/custom-error";
 
 export const errorMiddleware = (err: CustomError, req: Request, res: Response, next: NextFunction) => {
+    console.error(err);
     return buildResponse(res, err.statusCode || httpStatus.INTERNAL_SERVER_ERROR, err.message || ErrorMessages.SOMETHING_WENT_WRONG, null);
 }

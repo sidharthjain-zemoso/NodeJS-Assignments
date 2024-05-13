@@ -1,8 +1,9 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, Length, IsEmail, isDataType, Index } from 'sequelize-typescript';
 import { User } from './user';
+import { ICandidate } from '../interfaces/candidate';
 
 @Table
-export class Candidate extends Model<Candidate> {
+export class Candidate extends Model<ICandidate> {
     @Column({ primaryKey: true, autoIncrement: true })
     candidateId!: number;
 

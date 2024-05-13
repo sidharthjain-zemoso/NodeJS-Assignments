@@ -5,6 +5,7 @@ import { Dialect } from 'sequelize';
 import { User } from '../models/user';
 import { CourtSearch } from '../models/court-search';
 import { CandidateReport } from '../models/candidate-report';
+import { NullishPropertiesOf } from 'sequelize/types/utils';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -26,6 +27,14 @@ export const syncModels = async() => {
         // Sync models with the database
         await sequelize.sync({ force: true });
         console.log('All models were synchronized successfully.');
+
+        let user = await User.findByPk(1);
+        if (!user) {
+            user = await User.create({ name: "Test", email: "test@test.com", password: "test" } as Omit<User, NullishPropertiesOf<User>>);
+        }
+
+        console.log('User:', user.toJSON());
+
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
