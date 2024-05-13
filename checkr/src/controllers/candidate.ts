@@ -5,9 +5,6 @@ import { SuccessMessages } from "../constants/messages";
 
 const candidateController = {
     getCandidates: async (req: Request, res: Response, next: NextFunction) => {
-        // get all candidates
-        console.log(req);
-        throw new Error("My error");
         const data: any[] = []; // fetch using candidate service
         buildResponse(res, httpStatus.OK, SuccessMessages.fetched("Candidates"), data);
     },

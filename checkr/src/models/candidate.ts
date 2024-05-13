@@ -10,6 +10,7 @@ export class Candidate extends Model<Candidate> {
     @Column
     name!: string;
 
+    @Index
     @IsEmail
     @Length({ min: 6, max: 45 })
     @Column

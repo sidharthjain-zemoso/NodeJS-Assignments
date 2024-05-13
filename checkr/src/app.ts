@@ -1,5 +1,4 @@
 import express from "express";
-import bodyParser from "body-parser";
 import { syncModels } from "./utils/db";
 import userRoutes from "./routes/user";
 import candidateRoutes from "./routes/candidate";

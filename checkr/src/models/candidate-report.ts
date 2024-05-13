@@ -4,7 +4,7 @@ import { Adjudication, Status } from '../constants/global';
 
 @Table
 export class CandidateReport extends Model<CandidateReport> {
-    @Index
+    // @Index mySql engine innoDB by default indexes on primary keys
     @ForeignKey(() => Candidate)
     @Column({ primaryKey: true })
     candidateId!: number;

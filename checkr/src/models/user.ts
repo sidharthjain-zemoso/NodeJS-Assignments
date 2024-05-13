@@ -1,4 +1,4 @@
-import { Table, Column, Model, HasMany, IsEmail } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, IsEmail, Index } from 'sequelize-typescript';
 import { Candidate } from './candidate';
 
 @Table
@@ -9,6 +9,7 @@ export class User extends Model<User> {
     @Column
     name!: string;
 
+    @Index
     @IsEmail
     @Column
     email!: string;
