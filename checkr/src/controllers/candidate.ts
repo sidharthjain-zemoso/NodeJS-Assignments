@@ -7,7 +7,7 @@ import { EmailConfig } from "../common/interfaces/pre-adverse-email-config";
 
 const candidateController = {
 
-    getCandidates: async (req: Request, res: Response, next: NextFunction) => {
+    getCandidateList: async (req: Request, res: Response, next: NextFunction) => {
         const { user } = req.body;
         const { pageNo = '1', pageSize = '20', search = '', filter = '{}' } = req.query;
 
@@ -20,7 +20,7 @@ const candidateController = {
         // Prepare filter data
         const filterData = { search: search.toString(), filter: parsedFilter };
 
-        const data = await CandidateService.getCandidates(user, paginationData, filterData);
+        const data = await CandidateService.getCandidateList(user, paginationData, filterData);
         buildResponse(res, httpStatus.OK, SuccessMessages.fetched("Candidates"), data);
     },
 

@@ -12,6 +12,6 @@ router.post("/signup", userValidators.signupUser, tryCatch(userController.signup
 
 router.post("/reset-password", userValidators.resetPassword, tryCatch(userController.resetPassword));
 
-router.post("/:userId", userValidators.getUserById, isAuth, tryCatch(userController.getUserById));
+router.get("/:userId", userValidators.getUserById, isAuth, tryCatch(userController.getUserById));
 
 export default router;

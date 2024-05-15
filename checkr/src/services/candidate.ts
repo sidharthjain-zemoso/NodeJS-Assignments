@@ -9,17 +9,17 @@ import { Adjudication, Status } from "../common/constants/global";
 import { PreAdverseEmail } from "../models/pre-adverse-email";
 import { EmailConfig } from "../common/interfaces/pre-adverse-email-config";
 import schedule from "node-schedule";
-import { CandidateAttributes, CandidateService, GetCandidatesFilterInterface, GetCandidatesResponseInterface, PaginationInterface } from "../interfaces/candidate-service";
+import { CandidateAttributes, CandidateService, getCandidateListFilterInterface, getCandidateListResponseInterface, PaginationInterface } from "../interfaces/candidate-service";
 import { processPendingEmails } from "../schedulers/email-scheduler";
 import CustomError from "../common/interfaces/custom-error";
 import httpStatus from "http-status";
 
 const candidateService: CandidateService = {
-    async getCandidates (
+    async getCandidateList (
         user: IUser,
         paginationData: PaginationInterface,
-        filterData: GetCandidatesFilterInterface
-    ): Promise<GetCandidatesResponseInterface> {
+        filterData: getCandidateListFilterInterface
+    ): Promise<getCandidateListResponseInterface> {
         try {
             const whereClause: any = {
                 [Op.and]: [
@@ -90,7 +90,7 @@ const candidateService: CandidateService = {
     },
     async exportCandidates (user: IUser) {
         try {
-            const candidates = await this.getCandidates(user, { pageNo: 1, pageSize: 1000 }, { search: '', filter: {} })
+            const candidates = await this.getCandidateList(user, { pageNo: 1, pageSize: 1000 }, { search: '', filter: {} })
                 .then(response => response.data);
             const csvData = candidates.map(candidate => [
                 candidate.name,

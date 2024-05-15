@@ -6,7 +6,7 @@ import isAuth from "../common/middlewares/auth";
 
 const router = express.Router();
 
-router.get("/list", isAuth, candidateValidators.getCandidates, tryCatch(candidateController.getCandidates));
+router.get("/list", isAuth, candidateValidators.getCandidateList, tryCatch(candidateController.getCandidateList));
 
 router.post("/add", isAuth, candidateValidators.addCandidate, tryCatch(candidateController.addCandidate));
 
