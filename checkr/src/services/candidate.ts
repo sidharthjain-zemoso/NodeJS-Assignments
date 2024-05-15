@@ -11,6 +11,8 @@ import { EmailConfig } from "../common/interfaces/pre-adverse-email-config";
 import schedule from "node-schedule";
 import { CandidateAttributes, CandidateService, GetCandidatesFilterInterface, GetCandidatesResponseInterface, PaginationInterface } from "../interfaces/candidate-service";
 import { processPendingEmails } from "../schedulers/email-scheduler";
+import CustomError from "../common/interfaces/custom-error";
+import httpStatus from "http-status";
 
 const candidateService: CandidateService = {
     async getCandidates (
@@ -47,34 +49,6 @@ const candidateService: CandidateService = {
                 where: whereClause,
                 raw: true // Return raw data for mapping
             });
-
-            // const candidates: any[] = await user.getCandidates!({
-            //     include: [
-            //         {
-            //             model: CandidateReport,
-            //             attributes: ["status", "adjudication", "updatedAt"]
-            //         }
-            //     ],
-            //     attributes: ["name", "location"],
-            //     limit: paginationData.pageSize,
-            //     offset: (paginationData.pageNo - 1) * paginationData.pageSize,
-            //     where: {
-            //         [Op.and]: [
-            //             filterData.filter,
-            //             {
-            //                 [Op.or]: [
-            //                     { name: { [Op.like]: `%${filterData.search}%` } },
-            //                     { location: { [Op.like]: `%${filterData.search}%` } },
-            //                     { "$candidateReport.status$": { [Op.like]: `%${filterData.search}%` } },
-            //                     { "$candidateReport.adjudication$": { [Op.like]: `%${filterData.search}%` } },
-            //                     { "$candidateReport.updatedAt$": { [Op.like]: `%${filterData.search}%` } }
-            //                 ]
-            //             }
-            //         ]
-            //     },
-            //     raw: true // Return raw data for mapping
-            // });
-            // const totalCount = await user.countCandidates!();
             const mappedCandidates: CandidateAttributes[] = candidates.map((candidate: any) => ({
                 name: candidate.name,
                 location: candidate.location,
@@ -86,7 +60,7 @@ const candidateService: CandidateService = {
             return { data: mappedCandidates, totalCount };
         } catch (error) {
             console.log(error);
-            throw new Error(ErrorMessages.errorFetching("Candidates"));
+            throw new CustomError(ErrorMessages.errorFetching("Candidates"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     },
 
@@ -95,7 +69,7 @@ const candidateService: CandidateService = {
             const candidates: Candidate[] = await Candidate.findAll!({ where: { candidateId }, include: [CandidateReport, CourtSearch] });
             return candidates[0];
         } catch (error) {
-            throw new Error(ErrorMessages.errorFetching("Candidate Data"));
+            throw new CustomError(ErrorMessages.errorFetching("Candidate Data"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     },
 
@@ -105,38 +79,37 @@ const candidateService: CandidateService = {
             if (report) {
                 await newCandidate.createCandidateReport!(report);
             }
-            const waitingToResolved = [];
             if (courtSearches) {
-                for (const courtSearch of courtSearches) {
-                    waitingToResolved.push(newCandidate.createCourtSearch!(courtSearch));
-                }
+                await Promise.all(courtSearches.map(courtSearch => newCandidate.createCourtSearch!(courtSearch)));
             }
-            await Promise.all(waitingToResolved);
             return newCandidate;
         } catch (error) {
             console.error(error);
-            throw new Error(ErrorMessages.errorAdding("Candidate"));
+            throw new CustomError(ErrorMessages.errorAdding("Candidate"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     },
     async exportCandidates (user: IUser) {
-        // Export candidates
-        const candidates = await this.getCandidates(user, { pageNo: 1, pageSize: 1000 }, { search: '', filter: {} })
-            .then(response => response.data);
-        const csvData = candidates.map(candidate => [
-            candidate.name,
-            candidate.location,
-            candidate.status,
-            candidate.adjudication,
-            candidate.updatedAt.toString() // Convert date to string format
-        ]);
+        try {
+            const candidates = await this.getCandidates(user, { pageNo: 1, pageSize: 1000 }, { search: '', filter: {} })
+                .then(response => response.data);
+            const csvData = candidates.map(candidate => [
+                candidate.name,
+                candidate.location,
+                candidate.status,
+                candidate.adjudication,
+                candidate.updatedAt.toString() // Convert date to string format
+            ]);
 
-        // Add header row by adding a row on top
-        csvData.unshift(['Name', 'Location', 'Status', 'Adjudication', 'Updated At']);
+            // Add header row by adding a row on top
+            csvData.unshift(['Name', 'Location', 'Status', 'Adjudication', 'Updated At']);
 
-        // Convert to CSV string
-        const csvString = csvData.map(row => row.join(',')).join('\n');
+            // Convert to CSV string
+            const csvString = csvData.map(row => row.join(',')).join('\n');
 
-        return csvString;
+            return csvString;
+        } catch (error) {
+            throw new CustomError(ErrorMessages.errorExporting("Candidates"), httpStatus.INTERNAL_SERVER_ERROR);
+        }
     },
 
     async engageCandidate (user: IUser, candidateId: number) {
@@ -155,7 +128,7 @@ const candidateService: CandidateService = {
             candidateReport.status = Status.CLEAR;
             await candidateReport.save();
         } catch (error) {
-            throw new Error(ErrorMessages.errorFetching("Candidate"));
+            throw new CustomError(ErrorMessages.errorPerformingAction("Engage"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     },
     async preAdverseAction (user: IUser, candidateId: number, preAdverseData: EmailConfig)  {
@@ -186,7 +159,7 @@ const candidateService: CandidateService = {
             await candidateReport.save();
 
         }catch (error) {
-            throw new Error(ErrorMessages.errorPerformingAction("Pre Adverse"));
+            throw new CustomError(ErrorMessages.errorPerformingAction("Pre Adverse"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

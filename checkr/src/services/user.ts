@@ -3,9 +3,12 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import CustomError from "../common/interfaces/custom-error";
 import { IUser } from "../common/interfaces/user";
-import { AUTH_SECRET } from "../common/constants/global";
+import { AUTH_SECRET, AUTH_TOKEN_EXPIRY } from "../common/constants/global";
+import { ErrorMessages } from "../common/constants/messages";
+import httpStatus from "http-status";
+import { ILoginUserResponse, IUserService } from "../interfaces/user-service";
 
-const UserService = {
+const UserService: IUserService = {
     async getUserById(userId: number) {
         return await User.findByPk(userId);
     },
@@ -14,20 +17,20 @@ const UserService = {
         const email = user.email;
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
-            throw new Error('User already exists');
+            throw new CustomError(ErrorMessages.USER_EXISTS, httpStatus.BAD_REQUEST);
         }
         user.password = await bcrypt.hash(user.password, 12);
         return await User.create(user);
     },
 
-    async loginUser (email: string, password: string) {
+    async loginUser (email: string, password: string): Promise<ILoginUserResponse> {
         const user = await User.findOne({ where: { email } });
         if (!user) {
-            throw new CustomError("Invalid email or password", 401);
+            throw new CustomError(ErrorMessages.INVALID_CREDENTIALS, httpStatus.UNAUTHORIZED);
         }
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            throw new CustomError("Invalid email or password", 401);
+            throw new CustomError(ErrorMessages.INVALID_CREDENTIALS, httpStatus.UNAUTHORIZED);
         }
         const payload = {
             email: user.email,
@@ -36,7 +39,7 @@ const UserService = {
         const token = jwt.sign(
             payload,
             AUTH_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: AUTH_TOKEN_EXPIRY }
         );
         return { token, user };
     }

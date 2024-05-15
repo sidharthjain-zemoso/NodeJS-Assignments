@@ -3,6 +3,7 @@ export const ErrorMessages = {
     INVALID_CREDENTIALS: 'Invalid credentials',
     NOT_AUTHORIZED: 'Not authorized',
     NOT_AUTHENTICATED: 'Not authenticated',
+    USER_EXISTS: 'User already exists',
 
     errorFetching: (key: string) => `Error while fetching ${key}`,
     errorPerformingAction: (action: string) => `Error while performing ${action}`,

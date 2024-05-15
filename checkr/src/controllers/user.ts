@@ -27,15 +27,6 @@ const userController = {
         // reset password
         buildResponse(res, httpStatus.OK, SuccessMessages.reset("Password"), null);
     },
-    getUsers: async (req: Request, res: Response, next: NextFunction) => {
-        // get all users
-        const data: any[] = []; // fetch using user service
-        buildResponse(res, httpStatus.OK, SuccessMessages.fetched("Users"), data);
-    },
-    deleteUser: async (req: Request, res: Response, next: NextFunction) => {
-        // delete user
-        buildResponse(res, httpStatus.OK, SuccessMessages.deleted("User"), null);
-    },
 }
 
 export default userController;

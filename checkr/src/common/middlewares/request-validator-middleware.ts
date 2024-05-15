@@ -41,6 +41,6 @@ export const validateRequestBody = (schema: z.ZodObject<any, any>) => {
 
 const getErrorMessage = (error: any) => {
     return error.errors.map((err: any) => {
-        return {field: err.path[0], message: err.message};
+        return {field: err.path.map((path: string) => path).join("."), message: err.message};
     });
 }

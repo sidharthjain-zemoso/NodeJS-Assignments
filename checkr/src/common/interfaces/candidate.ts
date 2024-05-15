@@ -2,7 +2,6 @@ import { CandidateReport } from "../../models/candidate-report";
 import { CourtSearch } from "../../models/court-search";
 
 export interface ICandidate {
-    save (): unknown;
     candidateId: number;
     name: string;
     email: string;
@@ -13,8 +12,9 @@ export interface ICandidate {
     driversLicense: string;
     userId: number;
     
-    createCourtSearch ? (courtSearch: CourtSearch): unknown;
-    createCandidateReport?(report: CandidateReport): unknown;
+    save (): PromiseLike<unknown>;
+    createCourtSearch ? (courtSearch: CourtSearch): PromiseLike<unknown>;
+    createCandidateReport?(report: CandidateReport): PromiseLike<unknown>;
+    createPreAdverseEmail?(options:any): PromiseLike<unknown>;
     getCandidateReport?(): CandidateReport | PromiseLike<CandidateReport>;
-    createPreAdverseEmail?(options:any): unknown;
 }

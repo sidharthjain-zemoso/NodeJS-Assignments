@@ -29,24 +29,26 @@ export const exportCandidatesSchema = z.object({
 });
 
 export const addCandidateSchema = z.object({
-    name: z.string().min(3).max(45),
-    email: z.string().email(),
-    dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    phone: z.string().min(10).max(10),
-    location: z.string().min(3).max(45),
-    zipcode: z.string().min(5).max(5),
-    socialSecurity: z.string().regex(/^\d{3}-\d{2}-\d{4}$/),
-    driversLicense: z.string().min(10).max(10),
-    candidateReport: z.object({
-        status: z.string().optional(),
-        adjudication: z.string().optional(),
-        package: z.string().optional(),
-        turnAroundTime: z.number().int().positive().optional(),
-    }).optional(),
-    courtSearch: z.array(z.object({
-        search: z.string().optional(),
-        status: z.string().optional(),
-        date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-    })).optional(),
+    candidate: z.object({
+        name: z.string().min(3).max(45),
+        email: z.string().email(),
+        dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        phone: z.string().min(10).max(10),
+        location: z.string().min(3).max(45),
+        zipcode: z.string().min(5).max(5),
+        socialSecurity: z.string().regex(/^\d{3}-\d{2}-\d{4}$/),
+        driversLicense: z.string().min(9).max(13),
+        candidateReport: z.object({
+            status: z.string().optional(),
+            adjudication: z.string().optional(),
+            package: z.string().optional(),
+            turnAroundTime: z.number().int().positive().optional(),
+        }).optional(),
+        courtSearch: z.array(z.object({
+            search: z.string().optional(),
+            status: z.string().optional(),
+            date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+        })).optional()
+    }),
 });
 

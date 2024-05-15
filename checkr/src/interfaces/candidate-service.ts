@@ -34,9 +34,9 @@ export interface GetCandidatesFilterInterface {
 }
 
 export interface CandidateService {
-    preAdverseAction (user: IUser, candidateId: number, preAdverseData: EmailConfig): unknown;
-    engageCandidate (user: any, candidateId: number): unknown;
-    exportCandidates (user: any): unknown;
+    preAdverseAction (user: IUser, candidateId: number, preAdverseData: EmailConfig): Promise<void>;
+    engageCandidate (user: IUser, candidateId: number): Promise<void>;
+    exportCandidates (user: IUser): Promise<string>;
     addCandidate (user: IUser, candidate: Candidate, report?: CandidateReport, courtSearches?: CourtSearch[]): Promise<ICandidate>;
     getCandidateDataById (user: IUser, candidateId: number): Promise<Candidate | null>;
     getCandidates (user: IUser, paginationData: PaginationInterface, filterData: GetCandidatesFilterInterface): Promise<GetCandidatesResponseInterface>;
