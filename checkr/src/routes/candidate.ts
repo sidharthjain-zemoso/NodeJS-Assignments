@@ -10,11 +10,11 @@ router.get("/list", isAuth, candidateValidators.getCandidates, tryCatch(candidat
 
 router.post("/add", isAuth, candidateValidators.addCandidate, tryCatch(candidateController.addCandidate));
 
-router.get("/:candidateId/details", isAuth, candidateValidators.getCandidateDataById, tryCatch(candidateController.getCandidateDataById));
+router.get("/:candidateId", isAuth, candidateValidators.getCandidateById, tryCatch(candidateController.getCandidateById));
 
 router.post("/:candidateId/actions/pre-adverse", isAuth, candidateValidators.preAdverseAction, tryCatch(candidateController.preAdverseAction));
 
-router.post("/:candidateId/actions/engage", isAuth, candidateValidators.engageCandidate, tryCatch(candidateController.engageCandidate));
+router.put("/:candidateId/actions/engage", isAuth, candidateValidators.engageCandidate, tryCatch(candidateController.engageCandidate));
 
 router.get("/export", isAuth, candidateValidators.exportCandidates, tryCatch(candidateController.exportCandidates));
 

@@ -16,6 +16,6 @@ export const forgotPasswordSchema = z.object({
     email: z.string().email(),
 });
 
-export const getUserDataByIdSchema = z.object({
+export const getUserByIdSchema = z.object({
     userId: z.coerce.number().min(1),
 });

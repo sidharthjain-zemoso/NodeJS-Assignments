@@ -38,6 +38,6 @@ export interface CandidateService {
     engageCandidate (user: IUser, candidateId: number): Promise<void>;
     exportCandidates (user: IUser): Promise<string>;
     addCandidate (user: IUser, candidate: Candidate, report?: CandidateReport, courtSearches?: CourtSearch[]): Promise<ICandidate>;
-    getCandidateDataById (user: IUser, candidateId: number): Promise<Candidate | null>;
+    getCandidateById (user: IUser, candidateId: number): Promise<Candidate | null>;
     getCandidates (user: IUser, paginationData: PaginationInterface, filterData: GetCandidatesFilterInterface): Promise<GetCandidatesResponseInterface>;
 }

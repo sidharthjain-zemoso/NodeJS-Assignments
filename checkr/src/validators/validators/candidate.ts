@@ -4,7 +4,7 @@ import { validatePath, validateQuery, validateRequestBody } from "../../common/m
 
 const candidateValidators = {
     getCandidates: validateQuery(getDataWithSearchAndFilterSchema),
-    getCandidateDataById: validatePath(candidateIdPathParamSchema),
+    getCandidateById: validatePath(candidateIdPathParamSchema),
     preAdverseAction: validateRequestBody(preAdverseActionSchema),
     engageCandidate: validatePath(candidateIdPathParamSchema),
     exportCandidates: validateRequestBody(exportCandidatesSchema),

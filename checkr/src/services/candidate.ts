@@ -64,7 +64,7 @@ const candidateService: CandidateService = {
         }
     },
 
-    async getCandidateDataById (user: IUser, candidateId: number): Promise<Candidate | null> {
+    async getCandidateById (user: IUser, candidateId: number): Promise<Candidate | null> {
         try {
             const candidates: Candidate[] = await Candidate.findAll!({ where: { candidateId }, include: [CandidateReport, CourtSearch] });
             return candidates[0];
@@ -114,7 +114,7 @@ const candidateService: CandidateService = {
 
     async engageCandidate (user: IUser, candidateId: number) {
         try {
-            const candidate: ICandidate | null = await this.getCandidateDataById(user, candidateId);
+            const candidate: ICandidate | null = await this.getCandidateById(user, candidateId);
             if (!candidate) {
                 throw new Error(ErrorMessages.notFound("Candidate"));
             }

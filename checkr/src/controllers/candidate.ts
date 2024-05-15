@@ -24,8 +24,8 @@ const candidateController = {
         buildResponse(res, httpStatus.OK, SuccessMessages.fetched("Candidates"), data);
     },
 
-    getCandidateDataById: async (req: Request, res: Response, next: NextFunction) => {
-        const data = await CandidateService.getCandidateDataById(req.body.user, +req.params.candidateId);
+    getCandidateById: async (req: Request, res: Response, next: NextFunction) => {
+        const data = await CandidateService.getCandidateById(req.body.user, +req.params.candidateId);
         buildResponse(res, httpStatus.OK, SuccessMessages.fetched("Candidate Data"), data);
     },
 

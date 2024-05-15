@@ -6,7 +6,7 @@ import UserService from "../services/user";
 import { IUser } from "../common/interfaces/user";
 
 const userController = {
-    getUserDataById: async (req: Request, res: Response, next: NextFunction) => {
+    getUserById: async (req: Request, res: Response, next: NextFunction) => {
         // get user data by id
         const data = await UserService.getUserById(req.body.user);
         buildResponse(res, httpStatus.OK, SuccessMessages.fetched("User Data"), data);
