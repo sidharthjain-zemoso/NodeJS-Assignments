@@ -1,6 +1,9 @@
-import { Table, Column, Model, ForeignKey, BelongsTo, Length, IsEmail, isDataType, Index } from 'sequelize-typescript';
+import { Table, Column, Model, ForeignKey, BelongsTo, Length, IsEmail, isDataType, Index, HasMany, HasOne } from 'sequelize-typescript';
 import { User } from './user';
-import { ICandidate } from '../interfaces/candidate';
+import { ICandidate } from '../common/interfaces/candidate';
+import { CandidateReport } from './candidate-report';
+import { CourtSearch } from './court-search';
+import { PreAdverseEmail } from './pre-adverse-email';
 
 @Table
 export class Candidate extends Model<ICandidate> {
@@ -24,6 +27,10 @@ export class Candidate extends Model<ICandidate> {
     @Column
     phone!: string;
 
+    @Length({ min: 5, max: 45 })
+    @Column
+    location!: string; // we can create address model and then get location
+
     @Length({ min: 5, max: 6 })
     @Column
     zipcode!: string;
@@ -34,9 +41,6 @@ export class Candidate extends Model<ICandidate> {
     @Column
     driversLicense!: string;
 
-    @Column
-    createdDate!: Date;
-
     @Index
     @ForeignKey(() => User)
     @Column
@@ -44,4 +48,13 @@ export class Candidate extends Model<ICandidate> {
 
     @BelongsTo(() => User)
     user!: User;
+
+    @HasMany(() => CourtSearch)
+    courtSearch!: CourtSearch[];
+
+    @HasOne(() => CandidateReport)
+    candidateReport!: CandidateReport;
+
+    @HasOne(() => PreAdverseEmail)
+    preAdverseEmail!: PreAdverseEmail;
 }

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { buildResponse } from "../utils/build-response";
-import { ErrorMessages } from "../constants/messages";
 import httpStatus from "http-status";
 import CustomError from "../interfaces/custom-error";
+import { buildResponse } from "../../utils/build-response";
+import { ErrorMessages } from "../constants/messages";
 
 export const errorMiddleware = (err: CustomError, req: Request, res: Response, next: NextFunction) => {
     console.error(err);

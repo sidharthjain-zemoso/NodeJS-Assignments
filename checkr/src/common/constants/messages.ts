@@ -1,10 +1,15 @@
 export const ErrorMessages = {
     SOMETHING_WENT_WRONG: 'Something went wrong',
+    INVALID_CREDENTIALS: 'Invalid credentials',
+    NOT_AUTHORIZED: 'Not authorized',
+    NOT_AUTHENTICATED: 'Not authenticated',
 
     errorFetching: (key: string) => `Error while fetching ${key}`,
     errorPerformingAction: (action: string) => `Error while performing ${action}`,
     errorAdding: (key: string) => `Error while adding ${key}`,
-    errorDeleting: (key: string) => `Error while deleting ${key}`
+    errorDeleting: (key: string) => `Error while deleting ${key}`,
+    errorExporting: (key: string) => `Error while exporting ${key}`,
+    notFound: (key: string) => `${key} not found`,
 }
 
 export const SuccessMessages = {
