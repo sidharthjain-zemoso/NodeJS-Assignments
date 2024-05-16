@@ -1,8 +1,10 @@
 import { Table, Column, Model, HasMany, IsEmail, Index } from 'sequelize-typescript';
 import { Candidate } from './candidate';
+import { IUser } from '../common/interfaces/user';
 
 @Table
-export class User extends Model<User> {
+export class User extends Model<IUser> {
+
     @Column({ primaryKey: true, autoIncrement: true })
     userId!: number;
 

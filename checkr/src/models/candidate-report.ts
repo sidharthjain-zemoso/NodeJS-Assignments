@@ -1,6 +1,6 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, DataType, Index } from 'sequelize-typescript';
 import { Candidate } from './candidate';
-import { Adjudication, Status } from '../constants/global';
+import { Adjudication, Status } from '../common/constants/global';
 
 @Table
 export class CandidateReport extends Model<CandidateReport> {
@@ -21,7 +21,7 @@ export class CandidateReport extends Model<CandidateReport> {
     ({
         type: DataType.ENUM,
         values: [Adjudication.ADVERSE_ACTION, Adjudication.ENGAGE],
-        allowNull: false
+        allowNull: true
     })
     adjudication!: Adjudication;
 
@@ -30,12 +30,6 @@ export class CandidateReport extends Model<CandidateReport> {
 
     @Column
     turnAroundTime!: number;
-
-    @Column
-    createdDate!: Date;
-
-    @Column
-    updatedDate!: Date;
 
     @BelongsTo(() => Candidate)
     candidate!: Candidate;

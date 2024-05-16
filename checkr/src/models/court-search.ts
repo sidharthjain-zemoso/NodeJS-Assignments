@@ -1,6 +1,6 @@
 import { Table, Column, Model, ForeignKey, BelongsTo, DataType, Index } from 'sequelize-typescript';
 import { Candidate } from './candidate';
-import { Status } from '../constants/global';
+import { Status } from '../common/constants/global';
 
 @Table
 export class CourtSearch extends Model<CourtSearch> {

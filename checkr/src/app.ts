@@ -4,7 +4,7 @@ import userRoutes from "./routes/user";
 import candidateRoutes from "./routes/candidate";
 import cors from "cors";
 import { config } from "dotenv";
-import { errorMiddleware } from "./middlewares/error-middleware";
+import { errorMiddleware } from "./common/middlewares/error-middleware";
 
 config();
 
@@ -12,8 +12,7 @@ const app = express();
 
 app.use(cors());
 
-// not needed with express 4.16+
-// app.use(bodyParser.json());
+app.use(express.json());
 
 app.use("/", userRoutes);
 app.use("/candidate", candidateRoutes);
@@ -22,6 +21,6 @@ app.use(errorMiddleware);
 
 syncModels().then(() => {
     app.listen(process.env.PORT, () => {
-        console.log('Server is running on port 3000');
+        console.log('Server is running on port', process.env.PORT);
     });
 });
