@@ -11,7 +11,7 @@ import { PreAdverseEmail } from '../models/pre-adverse-email';
 dotenv.config();
 
 export const sequelize = new Sequelize({
-    dialect: (process.env.DB_DIALECT! as Dialect),
+    dialect: 'mysql' as Dialect,
     database: process.env.DB_NAME!,
     username: process.env.DB_USER!,
     password: process.env.DB_PASSWORD!,
@@ -19,7 +19,7 @@ export const sequelize = new Sequelize({
     models: [User, Candidate, CourtSearch, CandidateReport, PreAdverseEmail]
 });
 
-export const syncModels = async() => {
+export const syncModels = async () => {
     try {
         await sequelize.authenticate();
         console.log('Connection has been established successfully.');

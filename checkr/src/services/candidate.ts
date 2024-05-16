@@ -78,6 +78,7 @@ const candidateService: CandidateService = {
             if (error instanceof CustomError) {
                 throw error;
             }
+            console.error(error);
             throw new CustomError(ErrorMessages.errorFetching("Candidate Data"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     },
@@ -126,7 +127,7 @@ const candidateService: CandidateService = {
         try {
             const candidate: ICandidate = await this.getCandidateById(user, candidateId);
             const candidateReport = await candidate.getCandidateReport!();
-            
+
             if (!candidateReport) {
                 throw new CustomError(ErrorMessages.notFound("Candidate Report"), httpStatus.BAD_REQUEST);
             }
@@ -155,20 +156,23 @@ const candidateService: CandidateService = {
             await candidate[0].createPreAdverseEmail!(preAdverseData);
 
             // Schedule job to process pending emails
-            console.log('Scheduling job to process pending emails every 5 minutes', new Date());
+            // console.log('Scheduling job to process pending emails every 5 minutes', new Date());
             // A cron job is a scheduled task executed at specific intervals by a cron daemon or scheduler in Unix-like operating systems. 
             // It allows you to automate repetitive tasks, such as running scripts, executing commands, or sending emails, 
             // without manual intervention.
-            const job = schedule.scheduleJob(`*/${preAdverseData.days} * * * *`, () => {
-                console.log('Processing pending emails at ', new Date());
-                processPendingEmails(candidateId);
-            });
+            // const job = schedule.scheduleJob(`*/${preAdverseData.days} * * * *`, () => {
+            //     console.log('Processing pending emails at ', new Date());
+            //     processPendingEmails(candidateId);
+            // });
 
             candidateReport.adjudication = Adjudication.ADVERSE_ACTION;
             candidateReport.status = Status.CONSIDER;
             await candidateReport.save();
-
-        }catch (error) {
+        } catch (error) {
+            if (error instanceof CustomError) {
+                throw error;
+            }
+            console.error(error);
             throw new CustomError(ErrorMessages.errorPerformingAction("Pre Adverse"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     }

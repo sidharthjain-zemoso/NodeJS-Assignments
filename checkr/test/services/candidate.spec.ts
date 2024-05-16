@@ -11,6 +11,7 @@ import { ErrorMessages } from "../../src/common/constants/messages";
 import { CandidateReport } from "../../src/models/candidate-report";
 import { Adjudication, Status } from "../../src/common/constants/global";
 import { PreAdverseEmail } from "../../src/models/pre-adverse-email";
+import { CourtSearch } from "../../src/models/court-search";
 
 describe("Candidate Service", () => {
     let req: Partial<Request>;
@@ -20,7 +21,7 @@ describe("Candidate Service", () => {
     let candidateData: any;
     let candidate: any;
 
-    before(async() => {
+    before(async () => {
         await syncModels();
         user = await User.create({
             name: "test user",
@@ -61,6 +62,8 @@ describe("Candidate Service", () => {
             ]
         }
         candidate = await CandidateService.addCandidate(user, candidateData, candidateData.report, candidateData.courtSearch);
+        console.log("candidate:", candidate);
+
     });
 
     beforeEach(() => {
@@ -69,9 +72,13 @@ describe("Candidate Service", () => {
         next = sinon.stub();
     });
 
+    afterEach(() => {
+        sinon.restore();
+    });
+
     describe("getCandidateList", () => {
         it("should get candidate list", async () => {
-            const data = await CandidateService.getCandidateList(user, {pageNo: 1, pageSize: 20}, {search: '', filter: {}});
+            const data = await CandidateService.getCandidateList(user, { pageNo: 1, pageSize: 20 }, { search: '', filter: {} });
             expect(data).to.have.property("data");
             expect(data).to.have.property("totalCount");
             expect(data.data).to.be.an("array");
@@ -101,7 +108,7 @@ describe("Candidate Service", () => {
 
     describe("getCandidateById - throws error when candidateId is not found", () => {
         it("should get candidate by id", async () => {
-            Candidate.findOne = sinon.stub().returns(null);
+            sinon.stub(Candidate, 'findOne').returns(Promise.resolve(null) as any as Promise<Candidate>);
             try {
                 const data = await CandidateService.getCandidateById(user, 12);
                 // If no error is thrown, fail the test
@@ -111,6 +118,7 @@ describe("Candidate Service", () => {
                 expect(error.message).to.equal("Candidate not found");
                 expect(error.statusCode).to.equal(400);
             }
+            (Candidate.findOne as any).restore();
         });
     });
 
@@ -139,7 +147,8 @@ describe("Candidate Service", () => {
 
     describe("addCandidate - throws error when candidate is not added", () => {
         it("should add candidate", async () => {
-            Candidate.create = sinon.stub().throws(new Error("Some error occurred while adding candidate"));
+            // Candidate.create = sinon.stub().throws(new Error("Some error occurred while adding candidate"));
+            sinon.stub(Candidate, 'create').throws(new Error("Some error occurred while adding candidate"));
             try {
                 const data = await CandidateService.addCandidate(user, candidateData, candidateData.report, candidateData.courtSearch);
                 // If no error is thrown, fail the test
@@ -149,12 +158,14 @@ describe("Candidate Service", () => {
                 expect(error.message).to.equal(ErrorMessages.errorAdding("Candidate"));
                 expect(error.statusCode).to.equal(500);
             }
+            (Candidate.create as any).restore();
         });
     });
 
     describe("getCandidateList - throws error when candidates are not fetched", () => {
         it("should get candidate list", async () => {
-            Candidate.findAll = sinon.stub().throws(new Error("Error fetching candidates"));
+            // Candidate.findAll = sinon.stub().throws(new Error("Error fetching candidates"));
+            sinon.stub(Candidate, 'findAll').throws(new Error("Error fetching candidates"));
             try {
                 const data = await CandidateService.getCandidateList(user, { pageNo: 1, pageSize: 20 }, { search: '', filter: {} });
                 // If no error is thrown, fail the test
@@ -164,17 +175,23 @@ describe("Candidate Service", () => {
                 expect(error.message).to.equal(ErrorMessages.errorFetching("Candidates"));
                 expect(error.statusCode).to.equal(500);
             }
+            (Candidate.findAll as any).restore();
         });
     });
 
     describe("engageCandidate", () => {
         it("should engage candidate", async () => {
-            const data = await CandidateService.engageCandidate(user, candidate.candidateId);
-            const candidateReport = await CandidateReport.findOne({ where: { candidateId: candidate.candidateId } });
-            expect(candidateReport?.status).to.equal(Status.CLEAR);
-            expect(candidateReport?.adjudication).to.equal(Adjudication.ENGAGE);
-            const preAdverseEmail = await PreAdverseEmail.findAll({ where: { candidateId: candidate.candidateId } });
-            expect(preAdverseEmail).to.be.an("array").that.is.empty;
+            try {
+                await CandidateService.engageCandidate(user, candidate.candidateId);
+                const candidateReport = await CandidateReport.findOne({ where: { candidateId: candidate.candidateId } });
+                expect(candidateReport?.status).to.equal(Status.CLEAR);
+                expect(candidateReport?.adjudication).to.equal(Adjudication.ENGAGE);
+                const preAdverseEmail = await PreAdverseEmail.findAll({ where: { candidateId: candidate.candidateId } });
+                expect(preAdverseEmail).to.be.an("array").that.is.empty;
+            } catch (e) {
+                console.log("error:", e);
+                assert.fail("Not expected an error to be thrown.");
+            }
         });
     });
 
@@ -188,17 +205,26 @@ describe("Candidate Service", () => {
                 count: 3,
                 days: 3
             };
-            await CandidateService.preAdverseAction(user, candidate.candidateId, preAdverseData);
-            const candidateReport = await CandidateReport.findOne({ where: { candidateId: candidate.candidateId } });
-            expect(candidateReport?.status).to.equal(Status.CONSIDER);
-            expect(candidateReport?.adjudication).to.equal(Adjudication.ADVERSE_ACTION);
-            const preAdverseEmail = await PreAdverseEmail.findAll({ where: { candidateId: candidate.candidateId } });
-            expect(preAdverseEmail).to.be.an("array").that.is.not.empty;
+            try {
+                await CandidateService.preAdverseAction(user, candidate.candidateId, preAdverseData);
+                const candidateReport = await CandidateReport.findOne({ where: { candidateId: candidate.candidateId } });
+                expect(candidateReport?.status).to.equal(Status.CONSIDER);
+                expect(candidateReport?.adjudication).to.equal(Adjudication.ADVERSE_ACTION);
+                const preAdverseEmail = await PreAdverseEmail.findAll({ where: { candidateId: candidate.candidateId } });
+                expect(preAdverseEmail).to.be.an("array").that.is.not.empty;
+                await PreAdverseEmail.destroy({ where: { candidateId: candidate.candidateId } });
+            } catch (e) {
+                console.log("error:", e);
+                assert.fail("Not expected an error to be thrown.");
+            }
         });
     });
 
-    after(async() => {
+    after(async () => {
         await User.destroy({ where: { userId: user.userId } });
+        await CandidateReport.destroy({ where: { candidateId: candidate.candidateId } });
+        await PreAdverseEmail.destroy({ where: { candidateId: candidate.candidateId } });
+        await CourtSearch.destroy({ where: { candidateId: candidate.candidateId } });
         await Candidate.destroy({ where: { candidateId: candidate.candidateId } });
     });
 });
