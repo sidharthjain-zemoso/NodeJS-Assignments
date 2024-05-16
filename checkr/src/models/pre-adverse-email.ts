@@ -1,4 +1,4 @@
-import { Table, Column, Model, HasMany, IsEmail, Index, BelongsTo, ForeignKey } from 'sequelize-typescript';
+import { Table, Column, Model, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { EmailConfig } from '../common/interfaces/pre-adverse-email-config';
 import { Candidate } from './candidate';
 

@@ -18,7 +18,6 @@ const isAuth = async (req: Request, res: Response, next: NextFunction) => {
         if (!decodedToken) {
             throw new CustomError(ErrorMessages.NOT_AUTHENTICATED, httpStatus.UNAUTHORIZED);
         }
-        console.log("Decoded token:", decodedToken);
         const user = await User.findByPk(decodedToken.userId);
         if (!user) {
             throw new CustomError(ErrorMessages.NOT_AUTHENTICATED, httpStatus.UNAUTHORIZED);

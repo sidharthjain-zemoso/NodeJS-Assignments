@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { GetPublicKeyOrSecret, Secret } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import sinon, { SinonStub } from "sinon";
 import { expect } from "chai";
 import httpStatus from "http-status";
@@ -69,7 +69,7 @@ describe("isAuth middleware", () => {
 
     it("should call next without error if everything is valid", async () => {
         const validToken = jwt.sign({ userId: 123 }, AUTH_SECRET);
-        req.get = sinon.stub().returns(null);
+        req.get = sinon.stub().returns(`Bearer ${validToken}`);
         jwt.verify = sinon.stub().returns({ userId: 123 });
         User.findByPk = sinon.stub().returns(Promise.resolve({ id: 123 } as any)); // Mock user found
         await isAuth(req as Request, res as Response, next as NextFunction);

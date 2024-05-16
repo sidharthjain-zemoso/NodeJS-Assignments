@@ -9,7 +9,7 @@ import { Adjudication, Status } from "../common/constants/global";
 import { PreAdverseEmail } from "../models/pre-adverse-email";
 import { EmailConfig } from "../common/interfaces/pre-adverse-email-config";
 import schedule from "node-schedule";
-import { CandidateAttributes, CandidateService, getCandidateListFilterInterface, getCandidateListResponseInterface, PaginationInterface } from "../interfaces/candidate-service";
+import { CandidateAttributes, CandidateService, IGetCandidateListFilter, IGetCandidateListResponse, PaginationInterface } from "../interfaces/candidate-service";
 import { processPendingEmails } from "../schedulers/email-scheduler";
 import CustomError from "../common/interfaces/custom-error";
 import httpStatus from "http-status";
@@ -18,8 +18,8 @@ const candidateService: CandidateService = {
     async getCandidateList (
         user: IUser,
         paginationData: PaginationInterface,
-        filterData: getCandidateListFilterInterface
-    ): Promise<getCandidateListResponseInterface> {
+        filterData: IGetCandidateListFilter
+    ): Promise<IGetCandidateListResponse> {
         try {
             const whereClause: any = {
                 [Op.and]: [
@@ -60,15 +60,24 @@ const candidateService: CandidateService = {
             return { data: mappedCandidates, totalCount };
         } catch (error) {
             console.log(error);
+            if (error instanceof CustomError) {
+                throw error;
+            }
             throw new CustomError(ErrorMessages.errorFetching("Candidates"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     },
 
-    async getCandidateById (user: IUser, candidateId: number): Promise<Candidate | null> {
+    async getCandidateById (user: IUser, candidateId: number): Promise<Candidate> {
         try {
-            const candidates: Candidate[] = await Candidate.findAll!({ where: { candidateId }, include: [CandidateReport, CourtSearch] });
-            return candidates[0];
+            const candidate: Candidate | null = await Candidate.findOne!({ where: { candidateId }, include: [CandidateReport, CourtSearch] });
+            if (!candidate) {
+                throw new CustomError(ErrorMessages.notFound("Candidate"), httpStatus.BAD_REQUEST);
+            }
+            return candidate;
         } catch (error) {
+            if (error instanceof CustomError) {
+                throw error;
+            }
             throw new CustomError(ErrorMessages.errorFetching("Candidate Data"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     },
@@ -108,26 +117,27 @@ const candidateService: CandidateService = {
 
             return csvString;
         } catch (error) {
+            console.error(error);
             throw new CustomError(ErrorMessages.errorExporting("Candidates"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     },
 
     async engageCandidate (user: IUser, candidateId: number) {
         try {
-            const candidate: ICandidate | null = await this.getCandidateById(user, candidateId);
-            if (!candidate) {
-                throw new Error(ErrorMessages.notFound("Candidate"));
-            }
+            const candidate: ICandidate = await this.getCandidateById(user, candidateId);
             const candidateReport = await candidate.getCandidateReport!();
-
+            
             if (!candidateReport) {
-                throw new Error(ErrorMessages.notFound("Candidate Report"));
+                throw new CustomError(ErrorMessages.notFound("Candidate Report"), httpStatus.BAD_REQUEST);
             }
             await PreAdverseEmail.destroy({ where: { candidateId } });
             candidateReport.adjudication = Adjudication.ENGAGE;
             candidateReport.status = Status.CLEAR;
             await candidateReport.save();
         } catch (error) {
+            if (error instanceof CustomError) {
+                throw error;
+            }
             throw new CustomError(ErrorMessages.errorPerformingAction("Engage"), httpStatus.INTERNAL_SERVER_ERROR);
         }
     },
