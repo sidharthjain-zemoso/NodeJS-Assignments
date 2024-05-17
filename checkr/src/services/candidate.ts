@@ -59,11 +59,7 @@ const candidateService: CandidateService = {
 
             return { data: mappedCandidates, totalCount };
         } catch (error) {
-            console.log(error);
-            if (error instanceof CustomError) {
-                throw error;
-            }
-            throw new CustomError(ErrorMessages.errorFetching("Candidates"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorFetching("Candidates"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
 
@@ -75,11 +71,7 @@ const candidateService: CandidateService = {
             }
             return candidate;
         } catch (error) {
-            if (error instanceof CustomError) {
-                throw error;
-            }
-            console.error(error);
-            throw new CustomError(ErrorMessages.errorFetching("Candidate Data"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorFetching("Candidate Data"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
 
@@ -94,8 +86,7 @@ const candidateService: CandidateService = {
             }
             return newCandidate;
         } catch (error) {
-            console.error(error);
-            throw new CustomError(ErrorMessages.errorAdding("Candidate"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorAdding("Candidate"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
     async exportCandidates (user: IUser) {
@@ -118,8 +109,7 @@ const candidateService: CandidateService = {
 
             return csvString;
         } catch (error) {
-            console.error(error);
-            throw new CustomError(ErrorMessages.errorExporting("Candidates"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorExporting("Candidates"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
 
@@ -136,10 +126,7 @@ const candidateService: CandidateService = {
             candidateReport.status = Status.CLEAR;
             await candidateReport.save();
         } catch (error) {
-            if (error instanceof CustomError) {
-                throw error;
-            }
-            throw new CustomError(ErrorMessages.errorPerformingAction("Engage"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorPerformingAction("Engage"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
     async preAdverseAction (user: IUser, candidateId: number, preAdverseData: EmailConfig)  {
@@ -169,11 +156,7 @@ const candidateService: CandidateService = {
             candidateReport.status = Status.CONSIDER;
             await candidateReport.save();
         } catch (error) {
-            if (error instanceof CustomError) {
-                throw error;
-            }
-            console.error(error);
-            throw new CustomError(ErrorMessages.errorPerformingAction("Pre Adverse"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorPerformingAction("Pre Adverse"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 };
