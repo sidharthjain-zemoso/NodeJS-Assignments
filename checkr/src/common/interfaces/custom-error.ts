@@ -3,8 +3,7 @@ class CustomError extends Error {
 
     constructor(message: string, statusCode: number, error?: any) {
         if (error instanceof CustomError) {
-            super(error.message);
-            this.statusCode = error.statusCode;
+            throw error;
         } else {
             super(message);
             this.statusCode = statusCode;
