@@ -10,7 +10,7 @@ export class CourtSearch extends Model<CourtSearch> {
     @Column
     search!: string;
 
-    @Column({
+    @Column ({
         type: DataType.ENUM,
         values: [Status.CLEAR, Status.CONSIDER],
         allowNull: false

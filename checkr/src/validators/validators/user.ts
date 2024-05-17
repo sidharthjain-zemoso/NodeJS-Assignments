@@ -1,4 +1,3 @@
-import { get } from "http";
 import { validatePath, validateRequestBody } from "../../common/middlewares/request-validator-middleware";
 import { forgotPasswordSchema, getUserByIdSchema, loginUserSchema, signupUserSchema } from "../schemas/user";
 

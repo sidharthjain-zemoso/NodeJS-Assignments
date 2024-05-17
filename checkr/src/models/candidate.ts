@@ -1,4 +1,4 @@
-import { Table, Column, Model, ForeignKey, BelongsTo, Length, IsEmail, isDataType, Index, HasMany, HasOne } from 'sequelize-typescript';
+import { Table, Column, Model, ForeignKey, BelongsTo, Length, IsEmail, Index, HasMany, HasOne } from 'sequelize-typescript';
 import { User } from './user';
 import { ICandidate } from '../common/interfaces/candidate';
 import { CandidateReport } from './candidate-report';

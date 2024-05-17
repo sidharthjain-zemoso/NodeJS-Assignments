@@ -13,7 +13,7 @@ export interface CandidateAttributes {
     updatedAt: Date;
 }
 
-export interface getCandidateListResponseInterface {
+export interface IGetCandidateListResponse {
     data: CandidateAttributes[];
     totalCount: number;
 }
@@ -23,7 +23,7 @@ export interface PaginationInterface {
     pageSize: number;
 }
 
-export interface getCandidateListFilterInterface {
+export interface IGetCandidateListFilter {
     search?: string;
     filter?: {
         name?: string;
@@ -38,6 +38,6 @@ export interface CandidateService {
     engageCandidate (user: IUser, candidateId: number): Promise<void>;
     exportCandidates (user: IUser): Promise<string>;
     addCandidate (user: IUser, candidate: Candidate, report?: CandidateReport, courtSearches?: CourtSearch[]): Promise<ICandidate>;
-    getCandidateById (user: IUser, candidateId: number): Promise<Candidate | null>;
-    getCandidateList (user: IUser, paginationData: PaginationInterface, filterData: getCandidateListFilterInterface): Promise<getCandidateListResponseInterface>;
+    getCandidateById (user: IUser, candidateId: number): Promise<Candidate>;
+    getCandidateList (user: IUser, paginationData: PaginationInterface, filterData: IGetCandidateListFilter): Promise<IGetCandidateListResponse>;
 }

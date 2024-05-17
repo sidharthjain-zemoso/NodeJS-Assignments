@@ -9,7 +9,7 @@ import { Adjudication, Status } from "../common/constants/global";
 import { PreAdverseEmail } from "../models/pre-adverse-email";
 import { EmailConfig } from "../common/interfaces/pre-adverse-email-config";
 import schedule from "node-schedule";
-import { CandidateAttributes, CandidateService, getCandidateListFilterInterface, getCandidateListResponseInterface, PaginationInterface } from "../interfaces/candidate-service";
+import { CandidateAttributes, CandidateService, IGetCandidateListFilter, IGetCandidateListResponse, PaginationInterface } from "../interfaces/candidate-service";
 import { processPendingEmails } from "../schedulers/email-scheduler";
 import CustomError from "../common/interfaces/custom-error";
 import httpStatus from "http-status";
@@ -18,8 +18,8 @@ const candidateService: CandidateService = {
     async getCandidateList (
         user: IUser,
         paginationData: PaginationInterface,
-        filterData: getCandidateListFilterInterface
-    ): Promise<getCandidateListResponseInterface> {
+        filterData: IGetCandidateListFilter
+    ): Promise<IGetCandidateListResponse> {
         try {
             const whereClause: any = {
                 [Op.and]: [
@@ -59,17 +59,19 @@ const candidateService: CandidateService = {
 
             return { data: mappedCandidates, totalCount };
         } catch (error) {
-            console.log(error);
-            throw new CustomError(ErrorMessages.errorFetching("Candidates"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorFetching("Candidates"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
 
-    async getCandidateById (user: IUser, candidateId: number): Promise<Candidate | null> {
+    async getCandidateById (user: IUser, candidateId: number): Promise<Candidate> {
         try {
-            const candidates: Candidate[] = await Candidate.findAll!({ where: { candidateId }, include: [CandidateReport, CourtSearch] });
-            return candidates[0];
+            const candidate: Candidate | null = await Candidate.findOne!({ where: { candidateId }, include: [CandidateReport, CourtSearch] });
+            if (!candidate) {
+                throw new CustomError(ErrorMessages.notFound("Candidate"), httpStatus.BAD_REQUEST);
+            }
+            return candidate;
         } catch (error) {
-            throw new CustomError(ErrorMessages.errorFetching("Candidate Data"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorFetching("Candidate Data"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
 
@@ -84,8 +86,7 @@ const candidateService: CandidateService = {
             }
             return newCandidate;
         } catch (error) {
-            console.error(error);
-            throw new CustomError(ErrorMessages.errorAdding("Candidate"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorAdding("Candidate"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
     async exportCandidates (user: IUser) {
@@ -108,27 +109,24 @@ const candidateService: CandidateService = {
 
             return csvString;
         } catch (error) {
-            throw new CustomError(ErrorMessages.errorExporting("Candidates"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorExporting("Candidates"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
 
     async engageCandidate (user: IUser, candidateId: number) {
         try {
-            const candidate: ICandidate | null = await this.getCandidateById(user, candidateId);
-            if (!candidate) {
-                throw new Error(ErrorMessages.notFound("Candidate"));
-            }
+            const candidate: ICandidate = await this.getCandidateById(user, candidateId);
             const candidateReport = await candidate.getCandidateReport!();
 
             if (!candidateReport) {
-                throw new Error(ErrorMessages.notFound("Candidate Report"));
+                throw new CustomError(ErrorMessages.notFound("Candidate Report"), httpStatus.BAD_REQUEST);
             }
             await PreAdverseEmail.destroy({ where: { candidateId } });
             candidateReport.adjudication = Adjudication.ENGAGE;
             candidateReport.status = Status.CLEAR;
             await candidateReport.save();
         } catch (error) {
-            throw new CustomError(ErrorMessages.errorPerformingAction("Engage"), httpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomError(ErrorMessages.errorPerformingAction("Engage"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     },
     async preAdverseAction (user: IUser, candidateId: number, preAdverseData: EmailConfig)  {
@@ -145,21 +143,20 @@ const candidateService: CandidateService = {
             await candidate[0].createPreAdverseEmail!(preAdverseData);
 
             // Schedule job to process pending emails
-            console.log('Scheduling job to process pending emails every 5 minutes', new Date());
+            // console.log('Scheduling job to process pending emails every 5 minutes', new Date());
             // A cron job is a scheduled task executed at specific intervals by a cron daemon or scheduler in Unix-like operating systems. 
             // It allows you to automate repetitive tasks, such as running scripts, executing commands, or sending emails, 
             // without manual intervention.
-            const job = schedule.scheduleJob(`*/${preAdverseData.days} * * * *`, () => {
-                console.log('Processing pending emails at ', new Date());
-                processPendingEmails(candidateId);
-            });
+            // const job = schedule.scheduleJob(`*/${preAdverseData.days} * * * *`, () => {
+            //     console.log('Processing pending emails at ', new Date());
+            //     processPendingEmails(candidateId);
+            // });
 
             candidateReport.adjudication = Adjudication.ADVERSE_ACTION;
             candidateReport.status = Status.CONSIDER;
             await candidateReport.save();
-
-        }catch (error) {
-            throw new CustomError(ErrorMessages.errorPerformingAction("Pre Adverse"), httpStatus.INTERNAL_SERVER_ERROR);
+        } catch (error) {
+            throw new CustomError(ErrorMessages.errorPerformingAction("Pre Adverse"), httpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 };
