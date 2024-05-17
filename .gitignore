@@ -5,3 +5,5 @@ two-entity-poc/package-lock.json
 checkr/node_modules
 checkr/dist
 checkr/package-lock.json
+checkr/.nyc_output
+checkr/coverage/lcov-report
